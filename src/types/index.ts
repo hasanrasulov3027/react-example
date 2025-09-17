@@ -35,18 +35,17 @@ export interface Todo {
 
 // Context state interface
 export interface AppState {
-  count: number;
   user: {
     name: string;
-    age: number;
-  };
-  theme: string;
+    email: string;
+    roles: string[];
+  } | null;
 }
 
 // Action types
-export type Action = 
-  | { type: 'INCREMENT'; payload: number }
-  | { type: 'SET_NAME' };
+export type Action =
+  | { type: 'SET_USER'; payload: AppState['user'] }
+  | { type: 'LOG_OUT' }
 
 // Context value interface
 export interface ContextValue {

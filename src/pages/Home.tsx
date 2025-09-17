@@ -3,7 +3,7 @@ import SelectBox from "../components/SelectBox"
 import usePost from "../hooks/usePost"
 import useUsers from "../hooks/useUsers"
 import { useNavigate } from "react-router-dom"
-import { Post } from "../types"
+import { type Post } from "../types"
 import { type ReactElement } from "react"
 
 function Home(): ReactElement {

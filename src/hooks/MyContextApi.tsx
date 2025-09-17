@@ -1,16 +1,20 @@
-import { useReducer, type ReactNode } from "react"
+import { useEffect, useReducer, type ReactNode } from "react"
 import { type AppState, type Action } from "../types"
 import { MyContext } from "../context/AppContext"
+import { client } from "../utils";
+import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom"
 
 function Reducer(state: AppState, action: Action): AppState {
     switch (action.type) {
-        case "INCREMENT":
-            return {...state, count: state.count + action.payload };
-        case "SET_NAME":
-            return {...state, user: { ...state.user, name: "Nizom" } };
+        case "SET_USER":
+            return { ...state, user: action.payload }
+        case "LOG_OUT":
+            localStorage.removeItem("accessToken")
+            return { ...state, user: null }
         default:
             return state;
-    }    
+    }
 }
 
 interface MyContextApiProps {
@@ -19,10 +23,24 @@ interface MyContextApiProps {
 
 function MyContextApi({ children }: MyContextApiProps) {
     const [state, dispatch] = useReducer(Reducer, {
-        count: 0,
-        user: { name: "Hasan", age: 20 },
-        theme: "dark"
+        user: null
     })
+    const location = useLocation();
+
+    useEffect(() => {
+        let token = localStorage.getItem("accessToken")
+        if (token) {
+            client.get("/users?id=" + token).then(res => {
+                if (res.data.length === 0) {
+                    toast.error("Session expired. Please log in again.")
+                    localStorage.removeItem("accessToken")
+                } else {
+                    let user = res.data[0]
+                    dispatch({ type: "SET_USER", payload: user })
+                }
+            })
+        }
+    }, [location.pathname])
 
     return (
         <MyContext.Provider value={{ state, dispatch }} >

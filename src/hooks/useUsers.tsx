@@ -1,25 +1,22 @@
-import { useEffect, useState } from "react"
 import { client } from "../utils"
 import { type User, type UseUsersReturn } from "../types"
+import { useQuery } from "@tanstack/react-query"
 
 function useUsers(): UseUsersReturn {
-    const [users, setUsers] = useState<User[]>([])
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const { data, isLoading } = useQuery<User[]>({
+        queryKey: ["users"],
+        queryFn: async () => {
+            const res = await client.get("/users")
+            return res.data
+        },
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+        gcTime: 30 * 60 * 1000,
+    })
 
-    useEffect(() => {
-        getUsers()
-    }, [])
-
-    const getUsers = (): void => {
-        setIsLoading(true)
-        client.get("/users").then(res => {
-            setUsers(res.data)
-        }).finally(() => {
-            setIsLoading(false)
-        })
-    }
-
-    return { users, isLoading }
+    return { users: data ?? [], isLoading }
 }
 
 export default useUsers
