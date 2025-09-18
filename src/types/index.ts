@@ -40,12 +40,14 @@ export interface AppState {
     email: string;
     roles: string[];
   } | null;
+  isLoading: boolean;
 }
 
 // Action types
 export type Action =
   | { type: 'SET_USER'; payload: AppState['user'] }
   | { type: 'LOG_OUT' }
+  | { type: 'SET_LOADING' }
 
 // Context value interface
 export interface ContextValue {

@@ -31,7 +31,6 @@ export default function Login() {
                     toast.error("Incorrect password.");
                     return;
                 } else {
-                    toast.success("Login successful!");
                     localStorage.setItem("accessToken", user.id);
                     navigate("/");
                 }

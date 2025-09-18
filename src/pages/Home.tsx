@@ -5,6 +5,7 @@ import useUsers from "../hooks/useUsers"
 import { useNavigate } from "react-router-dom"
 import { type Post } from "../types"
 import { type ReactElement } from "react"
+import Header from "../components/Header"
 
 function Home(): ReactElement {
     const [selectedUser, setSelectedUser] = useState<number>(0)
@@ -18,6 +19,7 @@ function Home(): ReactElement {
 
     return (
         <div>
+            <Header />
             <h1>Post</h1>
             <SelectBox selectedUser={selectedUser} setSelectedUser={setSelectedUser} users={users} />
             <div className="row">

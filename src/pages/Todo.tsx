@@ -7,6 +7,7 @@ import useUsers from "../hooks/useUsers"
 import { type Todo as TodoType } from "../types"
 import { type ReactElement } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import Header from "../components/Header"
 
 function Todo(): ReactElement {
     const [selectedUser, setSelectedUser] = useState<number>(0)
@@ -35,6 +36,7 @@ function Todo(): ReactElement {
 
     return (
         <div>
+            <Header/>
             <h1>Todo List</h1>
             <SelectBox selectedUser={selectedUser} setSelectedUser={setSelectedUser} users={users} />
             {todos.map((todo: TodoType) => (

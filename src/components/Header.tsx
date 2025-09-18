@@ -5,6 +5,7 @@ import { useState } from "react";
 function Header() {
     const { state, dispatch } = useContextApi(); // assuming you have a logout function
     const [open, setOpen] = useState(false);
+    
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
@@ -44,7 +45,7 @@ function Header() {
                                         <button className="dropdown-item">Profile</button>
                                     </li>
                                     {
-                                        state.user?.roles.includes("admin") &&
+                                        state.user?.roles.includes("ADMIN") &&
                                         <li>
                                             <Link className="dropdown-item" to="/admin">
                                                 Admin

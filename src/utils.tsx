@@ -1,20 +1,24 @@
 import axios, { type AxiosInstance } from "axios";
 
 export const client: AxiosInstance = axios.create({
-    baseURL: "http://localhost:3000",
+  baseURL: "http://localhost:3000",
 })
 
 
 import { Navigate } from "react-router-dom";
+import { useContextApi } from "./hooks/useContextApi";
 
 interface Props {
-    isAllowed : boolean;
-    children: React.ReactNode;
+  role: string;
+  children: React.ReactNode;
 }
-function ProtectedRoute({ isAllowed, children }: Props) {
-    if (!isAllowed) {
-        return <Navigate to="/" replace />;
-    }
+function ProtectedRoute({ role, children }: Props) {
+
+  const { state: { user,isLoading } } = useContextApi();
+
+  if (!isLoading && !user?.roles.includes(role)) {
+    return <Navigate to="/" replace />;
+  }
   return (
     children
   )

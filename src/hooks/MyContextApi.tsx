@@ -12,6 +12,8 @@ function Reducer(state: AppState, action: Action): AppState {
         case "LOG_OUT":
             localStorage.removeItem("accessToken")
             return { ...state, user: null }
+        case "SET_LOADING":
+            return { ...state, isLoading: false }
         default:
             return state;
     }
@@ -23,7 +25,8 @@ interface MyContextApiProps {
 
 function MyContextApi({ children }: MyContextApiProps) {
     const [state, dispatch] = useReducer(Reducer, {
-        user: null
+        user: null,
+        isLoading: true
     })
     const location = useLocation();
 
@@ -38,6 +41,8 @@ function MyContextApi({ children }: MyContextApiProps) {
                     let user = res.data[0]
                     dispatch({ type: "SET_USER", payload: user })
                 }
+            }).finally(() => {
+                dispatch({ type: "SET_LOADING" })
             })
         }
     }, [location.pathname])
