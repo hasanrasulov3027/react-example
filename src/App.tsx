@@ -1,53 +1,87 @@
-import { Routes, Route } from "react-router-dom"
-import Home from "./pages/Home"
-import Todo from "./pages/Todo"
-import Comment from "./pages/Comment"
-import MyContextApi from "./hooks/MyContextApi"
-import { use, useContext, type ReactElement } from "react"
-import { ToastContainer } from "react-toastify"
-import Header from "./components/Header"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import Admin from "./pages/admin/Admin"
-import ProtectedRoute from "./utils"
-import Settings from "./pages/admin/Settings"
-import Users from "./pages/admin/Users"
-import Report from "./pages/admin/Report"
+import { useEffect, useState } from "react"
+import { db } from "./firebase"
+import { addDoc, collection, query, deleteDoc, doc, onSnapshot, orderBy } from "firebase/firestore";
+import { useForm } from "react-hook-form"
+import { toast } from "react-toastify";
 
+function App() {
 
-function App(): ReactElement {
+    const q = query(
+        collection(db, "posts"),
+        orderBy("created_at", "desc")
+    )
 
+    const [posts, setPosts] = useState<any[]>([])
+    const { register, handleSubmit, reset } = useForm()
+    const [fileBase64, setFileBase64] = useState<string>("");
+
+    useEffect(() => {
+        const unSub = onSnapshot(q, (snapshot) => {
+            setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        });
+        return () => unSub();
+    }, [])
+
+    // convert file → Base64 string
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file); // read file as base64
+        reader.onloadend = () => {
+            setFileBase64(reader.result as string);
+        };
+    };
+
+    async function addPost(data: any) {
+        try {
+            await addDoc(collection(db, "posts"), {
+                ...data,
+                imgBase64: fileBase64, // save Base64 string
+                created_at: Date.now()
+            });
+
+            
+
+            toast.success("Post added ✅");
+            reset();
+            setFileBase64("");
+        } catch (err) {
+            console.error(err);
+            toast.error("Error adding post ❌");
+        }
+    }
+
+    async function deletePost(id: string) {
+        try {
+            await deleteDoc(doc(db, "posts", id))
+            toast.success("Post deleted ✅")
+        } catch (error) {
+            console.error(error);
+            toast.error("Error deleting post ❌")
+        }
+    }
 
     return (
-        <>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/todo" element={
-                    <ProtectedRoute role={"USER"}>
-                        <Todo />
-                    </ProtectedRoute>
-                } />
-                <Route path="/admin" element={
-                    <ProtectedRoute role={"ADMIN"}>
-                        <Admin />
-                    </ProtectedRoute>
+        <div className="container">
+            <form onSubmit={handleSubmit((data) => addPost(data))}>
+                <input type="file" onChange={handleFileChange} />
+                <input type="text" placeholder="Title" {...register("title", { required: true })} />
+                <input type="text" placeholder="Description" {...register("description", { required: true })} />
+                <button type="submit">Add</button>
+            </form>
 
-                } >
-                    <Route path="/admin/users" element={
-                        <ProtectedRoute role={"SUPER_ADMIN"} >
-                            <Users />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/admin/reports" element={<Report />} />
-                    <Route path="/admin/settings" element={<Settings />} />
-                </Route>
-                <Route path="/comment" element={<Comment />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-            </Routes>
-            <ToastContainer />
-        </>
+            {posts.map((post: any) => (
+                <div key={post.id}>
+                    {post.imgBase64 && <img src={post.imgBase64} alt="post" width="200" />}
+                    <h1>{post.title}</h1>
+                    <p>{post.description}</p>
+                    <button onClick={() => deletePost(post.id)}>Delete</button>
+                </div>
+            ))}
+        </div>
     )
 }
 
-export default App
+export default App;

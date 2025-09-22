@@ -20,6 +20,9 @@ function Home(): ReactElement {
     return (
         <div>
             <Header />
+            <Main/>
+            <Product/>
+            <Footer/>
             <h1>Post</h1>
             <SelectBox selectedUser={selectedUser} setSelectedUser={setSelectedUser} users={users} />
             <div className="row">
