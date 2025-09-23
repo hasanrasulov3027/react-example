@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react"
 import { db } from "./firebase"
-import { addDoc, collection, query, deleteDoc, doc, onSnapshot, orderBy } from "firebase/firestore";
+import { addDoc, collection, query, deleteDoc, doc, onSnapshot, orderBy, where } from "firebase/firestore";
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify";
+import useCategory from "./hooks/useCategory";
 
 function App() {
 
+    const [selectedCategory, setSetelectedCategory] = useState("")
+
+    const queryIf = selectedCategory === "" ? orderBy("created_at", "desc") : where("categoryId", "==", selectedCategory)
+
     const q = query(
         collection(db, "posts"),
-        orderBy("created_at", "desc")
+        queryIf
     )
+
+    const { category } = useCategory()
 
     const [posts, setPosts] = useState<any[]>([])
     const { register, handleSubmit, reset } = useForm()
@@ -20,7 +27,9 @@ function App() {
             setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         });
         return () => unSub();
-    }, [])
+    }, [selectedCategory])
+
+
 
     // convert file → Base64 string
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +51,7 @@ function App() {
                 created_at: Date.now()
             });
 
-            
+
 
             toast.success("Post added ✅");
             reset();
@@ -72,6 +81,17 @@ function App() {
                 <button type="submit">Add</button>
             </form>
 
+            <span onClick={() => setSetelectedCategory("")} className="badge bg-primary cursor-pointer" key={category.id}>
+                All
+            </span>
+            {
+                category.map((category: any) => (
+                    <span onClick={() => setSetelectedCategory(category.id)} className="badge bg-primary cursor-pointer" key={category.id}>
+                        {category.name}
+                    </span>
+                ))
+            }
+            <hr />
             {posts.map((post: any) => (
                 <div key={post.id}>
                     {post.imgBase64 && <img src={post.imgBase64} alt="post" width="200" />}

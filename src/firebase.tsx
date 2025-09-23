@@ -5,7 +5,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyAuCfidgzA6OuqGsJVbtrNpZa6gPVx9Ce4",
     authDomain: "food-delivery-4a158.firebaseapp.com",
     projectId: "food-delivery-4a158",
     storageBucket: "food-delivery-4a158.firebasestorage.app",

@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import MyContextApi from './hooks/MyContextApi';
+import "./main.css"
 
 const queryClient = new QueryClient()
 
